@@ -1,13 +1,14 @@
 import sys
 
 def menu(conexion, cursorDB):
-    from Database_Controllers.userController import login, register_user
-    from Database_Controllers.adminController import register_admin
+    from Database_Controllers.login import login
+    from Database_Controllers.register import register_user, register_admin
     
     try:
         print("\n[-------¡Holaaaa!, Bienvenid@ a nuestra app MercadoVentas-------]\n")
         print(" 1.- Iniciar sesión\n 2.- Crear una cuenta\n 3.- Salir")
         opcion: str = input()
+        
         if opcion == "1":
             login(conexion, cursorDB)
         elif opcion == "2":
@@ -15,7 +16,7 @@ def menu(conexion, cursorDB):
             opcion1:str = input()
             if opcion1 == "1":
                 register_admin(cursorDB, conexion)
-            elif opcion == "2":
+            elif opcion1 == "2":
                 register_user(cursorDB, conexion)
             else:
                 print("\nOpción inválida crrrrrack, vuelve a intentarlo")
