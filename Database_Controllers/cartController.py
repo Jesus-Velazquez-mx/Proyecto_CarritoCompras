@@ -55,8 +55,10 @@ def compra(name, userID, cursorDB, conexion):
         
 def venta(name, userID, cursorDB, conexion):
     # Muestra el carrito del usuario, permite pagar o eliminar artículos
+    # (Se integró `payment.py` para cálculo de totales y procesamiento de pagos)
     from Database_Controllers.userController import InterfazU
-    
+    from Database_Controllers import payment
+
     try:
         print("[---------Carrito de ", name[0],"----------]")
         cursorDB.execute("""
@@ -67,18 +69,46 @@ def venta(name, userID, cursorDB, conexion):
             WHERE Carrito_Compras.USER_ID = ?
             """, (userID[0],)) 
         cosas_carrito = cursorDB.fetchall()
-        for cosa in cosas_carrito:
-            print("ID: ", cosa[0], "Producto:", cosa[1], "Categoría:", cosa[4])
+
+        if not cosas_carrito:
+            print("\nEl carrito está vacío.")
+            InterfazU(name, userID, cursorDB, conexion)
+            return
+
+        # Mostrar items y calcular total
+        total, detalle = payment.calculate_total(cosas_carrito)
+        for item in detalle:
+            print(f"ID carrito: {item[0]} - Producto: {item[1]} - Cantidad: {item[3]} - Precio unitario: {item[2]} - Subtotal: {item[4]}")
+
         opcion:str = input("\n 1.- Proceder al pago\n 2.- Eliminar artículo\n 3.- Regresar\n")
         if opcion == "1":
-            total = 0
-            for cosa in cosas_carrito:
-                nombre_producto = cosa[1]
-                precio_unidad = cosa[2]
-                cantidad = cosa[3]
-                subtotal = precio_unidad * cantidad
-                total += subtotal
-                print("Producto:", nombre_producto, "Categoría:", cosa[3], "Cantidad:", cantidad, "Precio unitario:", precio_unidad, "Subtotal:", subtotal)
+            print("\nTotal a pagar:", total)
+            metodo = input("Seleccione método de pago:\n 1.- Efectivo\n 2.- Tarjeta\n")
+            if metodo == "1":
+                try:
+                    paid = float(input("Ingrese monto entregado: "))
+                    cambio = payment.process_cash_payment(userID[0], total, paid, cosas_carrito, cursorDB, conexion)
+                    print(f"Pago aceptado. Cambio: {cambio}")
+                    print("\nCompra realizada con éxito. Pronto llegará a tu casa porque sé dónde vives guap@\n")
+                    InterfazU(name, userID, cursorDB, conexion)
+                    return
+                except ValueError as ve:
+                    print("Pago rechazado:", ve)
+                    venta(name, userID, cursorDB, conexion)
+            elif metodo == "2":
+                card = input("Ingrese número de tarjeta (simulado): ")
+                res = payment.process_card_payment(userID[0], total, card, cosas_carrito, cursorDB, conexion)
+                if res.get("success"):
+                    print("Pago con tarjeta aprobado. Ref:", res.get("tx_ref"))
+                    print("\nCompra realizada con éxito. Pronto llegará a tu casa porque sé dónde vives guap@\n")
+                    InterfazU(name, userID, cursorDB, conexion)
+                    return
+                else:
+                    print("Pago con tarjeta rechazado:", res.get("error"))
+                    venta(name, userID, cursorDB, conexion)
+            else:
+                print("Método inválido")
+                venta(name, userID, cursorDB, conexion)
         elif opcion == "2":
             id_articulo = input("\nIngrese el ID del artículo a eliminar: ")
             cursorDB.execute("DELETE FROM Carrito_Compras WHERE USER_ID = ? AND ID = ?", (userID[0], id_articulo))
@@ -90,14 +120,6 @@ def venta(name, userID, cursorDB, conexion):
         else:
             print("\nOpción inválida crrrrrack, vuelve a intentarlo")
             venta(name, userID, cursorDB, conexion)
-        print("\nTotal a pagar:", total)
-        opcion:str = input("\n¿Desea continuar?\n 1.- Si \n 2.- Regresar\n")
-        if opcion == "1":
-            cursorDB.execute("DELETE FROM Carrito_Compras WHERE USER_ID = ?", (userID))
-            cursorDB.execute("INSERT INTO VENTAS VALUES (?,?,?,?)", (None, userID[0], cosa[0], subtotal))
-            conexion.commit()
-            print("\nCompra realizada con éxito. Pronto llegará a tu casa porque sé dónde vives guap@\n")
-            InterfazU(name, userID, cursorDB, conexion)
     except Exception as e:
         # Maneja errores al mostrar/procesar la venta
         print("Error:", e)
