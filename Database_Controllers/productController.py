@@ -4,7 +4,10 @@ class Producto:
         self.precio = precio
         self.cantidad = cantidad
 
+    # Clase simple que representa un producto con nombre, precio y cantidad
+
 def Inventario(name, cursorDB, userID, conexion):
+    # Muestra y gestiona el inventario: listar, añadir y eliminar productos
     from Database_Controllers.adminController import Interfaz
     
     try:
@@ -45,9 +48,11 @@ def Inventario(name, cursorDB, userID, conexion):
             print("\nOpción inválida crrrrrack, vuelve a intentarlo")
             Inventario(name, cursorDB, userID, conexion)
     except Exception as e:
+        # Maneja errores de base de datos en el inventario
         print("Error: Conexión incorrecta con la data beis", e)
 
 def Categorias(name, userID, cursorDB, conexion):
+    # Muestra y gestiona categorías: listar, añadir y eliminar
     from Database_Controllers.adminController import Interfaz
     
     try:
@@ -77,4 +82,5 @@ def Categorias(name, userID, cursorDB, conexion):
             Interfaz(name, userID, cursorDB, conexion)  
             print("\nOpción inválida crrrrrack, vuelve a intentarlo")
     except Exception as e:
+        # Maneja errores al acceder/editar categorías
         print("Error en la databeis:", e)

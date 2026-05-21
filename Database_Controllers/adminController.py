@@ -1,10 +1,12 @@
 from Database_Controllers.userController import User
 
 class Admin(User):
+    # Subclase de User para representar a un administrador
     def __init__(self, nombre, contrasena, correo, numero):
         super().__init__(nombre, contrasena, correo, numero)
 
 def Interfaz(name, userID, cursorDB, conexion):
+    # Interfaz principal para admins: elegir entre inventario, categorías o ventas
     from Database_Controllers.productController import Inventario, Categorias
     from Database_Controllers.cartController import mostrar_todas_ventas
     from Utils.menu import menu

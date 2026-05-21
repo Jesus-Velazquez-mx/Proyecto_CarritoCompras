@@ -2,7 +2,10 @@ class Carrito:
     def __init__(self):
         self.lista_productos = []
 
+    # Representa un carrito de compras conteniendo una lista de productos
+
 def compra(name, userID, cursorDB, conexion):
+    # Permite al usuario navegar categorías, ver productos y añadir al carrito
     from Database_Controllers.userController import InterfazU
     
     try:
@@ -47,9 +50,11 @@ def compra(name, userID, cursorDB, conexion):
         elif opcion3 == "2":
             InterfazU(name, userID, cursorDB, conexion)
     except Exception as e:
+        # Maneja errores durante la operación de compra
         print("Error:", e)
         
 def venta(name, userID, cursorDB, conexion):
+    # Muestra el carrito del usuario, permite pagar o eliminar artículos
     from Database_Controllers.userController import InterfazU
     
     try:
@@ -94,9 +99,11 @@ def venta(name, userID, cursorDB, conexion):
             print("\nCompra realizada con éxito. Pronto llegará a tu casa porque sé dónde vives guap@\n")
             InterfazU(name, userID, cursorDB, conexion)
     except Exception as e:
+        # Maneja errores al mostrar/procesar la venta
         print("Error:", e)
 
 def mostrar_todas_ventas(name, userID, cursorDB, conexion):
+    # Muestra todas las ventas (para admins)
     from Database_Controllers.adminController import Interfaz
     
     try:
@@ -116,5 +123,6 @@ def mostrar_todas_ventas(name, userID, cursorDB, conexion):
                 print("Total:", venta[3])
                 print("---------------------------------------------------------")
     except Exception as e:
+        # Maneja errores al consultar ventas
         print("Error en la base de datos:", e)
     Interfaz(name, userID, cursorDB, conexion)

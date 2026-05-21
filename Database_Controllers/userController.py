@@ -7,7 +7,10 @@ class User:
         self.numero = numero
         self.acceso = False
 
+    # Clase base que representa un usuario con datos básicos y estado de acceso
+
 def InterfazU(name, userID, cursorDB, conexion):
+    # Interfaz de usuario: opciones para comprar, ver carrito o salir
     from Database_Controllers.cartController import compra, venta
     from Utils.menu import menu
     

@@ -2,6 +2,7 @@ import bcrypt
 import pwinput
 
 def login(conexion, cursorDB): 
+    # Maneja el proceso de inicio de sesión para usuarios y empleados
     from Database_Controllers.adminController import Interfaz
     from Database_Controllers.userController import InterfazU
     
@@ -9,10 +10,12 @@ def login(conexion, cursorDB):
     mail = input("Ingrese su correo: ")
     password = pwinput.pwinput("Ingrese su contraseña: ", mask='*')
     
+    # Buscar usuario en la tabla USUARIOS y verificar contraseña
     cursorDB.execute("SELECT CORREO, CONTRASENA FROM USUARIOS WHERE CORREO = ?", (mail,))
     user = cursorDB.fetchone() 
     if user:
         stored_password = user[1]
+        # Verifica contraseña usando bcrypt
         if bcrypt.checkpw(password.encode('utf-8'), stored_password):
             cursorDB.execute("SELECT NOMBRE FROM USUARIOS WHERE CORREO = ?", (mail,))
             name = cursorDB.fetchone()
@@ -24,6 +27,7 @@ def login(conexion, cursorDB):
     empleado = cursorDB.fetchone()
     if empleado:
         stored_password = empleado[1]
+        # Verifica contraseña de empleado usando bcrypt
         if bcrypt.checkpw(password.encode('utf-8'), stored_password):
             cursorDB.execute("SELECT NOMBRE FROM EMPLEADOS WHERE CORREO = ?", (mail,))
             name = cursorDB.fetchone()
